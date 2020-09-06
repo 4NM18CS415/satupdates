@@ -8,7 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "category")
+@Table(name = "Category")
 public class category extends AuditModel{
 	
 	@Id
@@ -16,7 +16,7 @@ public class category extends AuditModel{
 	private Long id;
 	
 	@Column
-	private String category;
+	private String Topic;
 	
 	@Column
 	private String subcategory;
@@ -41,12 +41,14 @@ public class category extends AuditModel{
 		this.id = id;
 	}
 
-	public String getCategory() {
-		return category;
+
+
+	public String getTopic() {
+		return Topic;
 	}
 
-	public void setCategory(String category) {
-		this.category = category;
+	public void setTopic(String topic) {
+		Topic = topic;
 	}
 
 	public String getSubcategory() {

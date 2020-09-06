@@ -57,13 +57,10 @@ public class QuizQuestionsController {
 	@Autowired
 	private categoryRepository categoryRepository;
 	
-
-	
 	@Value("${questionImage.upload-dir}")
 	private String uploadPath;
 	
-	@Value("${topicImage.upload-dir}")
-	private String uploadPath1;
+
 	
 	
 	@PostMapping("/api/create-quiz-questions/{subcategoryId}")
@@ -123,10 +120,9 @@ public class QuizQuestionsController {
 		}else {
 			question.setIsquestionComplete(true);
 		}
-		category subcategoryId =  categoryRepository.getOne(subcategoryid);
-		question.setSubcategoryId(subcategoryId);
-		quizQuestionsRepository.save(question);
-		return question;
+		category subcategory = categoryRepository.getOne(subcategoryid);
+		question.setSubcategory(subcategory);
+		 return quizQuestionsRepository.save(question); 
 	}
 	
 	@GetMapping("/api/getQuestion/{topic}")
@@ -293,66 +289,5 @@ public class QuizQuestionsController {
                 System.out.println("Failed to Delete image !!");
             }
 		 return "Successfully Deleted";
-	}
-	@PostMapping("/api/create-quiz-questions")
-	public category createCategory(@RequestParam(name="file",required = false) MultipartFile file,@ModelAttribute category category,HttpServletRequest request) 
-	{
-	
-		
-         String headerToken = request.getHeader("apiToken");
-		
-		int verifyapiToken = adminRepository.verifyapiTokens(headerToken);
-		
-		if(verifyapiToken == 0) {
-			
-			String error = "UnAuthorised Admin";
-			String message = "Not Successful";
-			
-			throw new UnauthorisedException(401, error, message);
-		}
-//		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-		
-		if(file!=null) {
-			long unique = new Date().getTime();
-			String fileName = unique + "-" + file.getOriginalFilename().replace(" ", "_");
-			String thumbnailName = unique + "-thumbnail-" + file.getOriginalFilename().replace(" ", "_");
-			OutputStream opStream = null;
-			category.setFilename(fileName);
-			category.setTumbnailName(thumbnailName);
-			try {
-				byte[] byteContent = file.getBytes();
-				File myFile = new File(uploadPath + fileName); // destination path
-				System.out.println("fileName is " + myFile);
-				// check if file exist, otherwise create the file before writing
-				if (!myFile.exists()) {
-					myFile.createNewFile();
-				}
-				opStream = new FileOutputStream(myFile);
-				opStream.write(byteContent);
-				opStream.flush();
-				opStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				File destinationDir = new File(uploadPath);
-				Thumbnails.of(uploadPath + fileName).size(900, 800).toFiles(destinationDir, Rename.NO_CHANGE);
-				Thumbnails.of(new File(uploadPath + fileName)).size(348, 235).toFile(uploadPath + thumbnailName);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		Boolean status = category.getStatus();
-		Boolean isTopicComplete = category.getIsTopicComplete();
-		category.setStatus(true);
-		if(isTopicComplete==null) {
-			category.setIsTopicComplete(false);
-		}else {
-			category.setIsTopicComplete(true);
-		}
-		categoryRepository.save(category);
-		return category;
-	}
-	
+	}	
 }
